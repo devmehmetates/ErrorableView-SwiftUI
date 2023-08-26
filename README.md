@@ -66,7 +66,7 @@ struct ContentView: ErrorableViewProtocol {
 
 ## Demo Images
 <div>
-  <img width = 255 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/69b5fcd7-dc27-4c84-ab28-f258f3a2d96d">
-  <img width = 255 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/ea08d457-d440-496f-a84f-9636611854a0">
-  <img width = 255 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/69a47f0d-95c4-4375-9aea-583c85fc9688">
+  <img width = 255 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/f30a0d95-53a8-42e0-a21d-db67ef093b0e">
+  <img width = 255 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/269ad7d4-ae61-40bc-a731-7dd87f116a4d">
+  <img width = 255 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/155a174f-dade-4bba-ba4b-dec12dfa6d7f">
 </div>
