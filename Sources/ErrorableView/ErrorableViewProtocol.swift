@@ -26,11 +26,11 @@ public extension ErrorableViewProtocol where Content == AnyView {
     ) -> Content {
         switch viewModel.state {
         case .loading:
-            loadingView()
+            return loadingView()
         case .successful:
-            successfulView()
+            return successfulView()
         case .failure:
-            failureView()
+            return failureView()
         }
     }
 
@@ -40,11 +40,11 @@ public extension ErrorableViewProtocol where Content == AnyView {
     ) -> Content {
         switch viewModel.state {
         case .loading:
-            loadingState
+            return loadingState
         case .successful:
-            successfulView()
+            return successfulView()
         case .failure:
-            failureView()
+            return failureView()
         }
     }
 
@@ -58,11 +58,11 @@ public extension ErrorableViewProtocol where Content == AnyView {
     ) -> Content {
         switch viewModel.state {
         case .loading:
-            loadingState
+            return loadingState
         case .successful:
-            successfulView()
+            return successfulView()
         case .failure:
-            failuteState(errorTitle: errorTitle, errorSubTitle: errorSubTitle, errorIcon: errorIcon, errorSystemIcon: errorSystemIcon, errorButtonTitle: errorButtonTitle)
+            return failuteState(errorTitle: errorTitle, errorSubTitle: errorSubTitle, errorIcon: errorIcon, errorSystemIcon: errorSystemIcon, errorButtonTitle: errorButtonTitle)
         }
     }
     
