@@ -157,50 +157,52 @@ public extension ErrorableView where Content: View {
         private var buttonTitle: LocalizedStringKey?
         private var buttonAction: (() -> Void)?
         private var dismissAction: (() -> Void)?
+        
+        public init() {}
 
         @discardableResult
-        func title(_ title: LocalizedStringKey) -> Self {
+        public func title(_ title: LocalizedStringKey) -> Self {
             self.title = title
             return self
         }
         
         @discardableResult
-        func subtitle(_ subtitle: LocalizedStringKey?) -> Self {
+        public func subtitle(_ subtitle: LocalizedStringKey?) -> Self {
             self.subtitle = subtitle
             return self
         }
         
         @discardableResult
-        func icon(_ icon: String?) -> Self {
+        public func icon(_ icon: String?) -> Self {
             self.icon = icon
             return self
         }
         
         @discardableResult
-        func systemName(_ systemName: String?) -> Self {
+        public func systemName(_ systemName: String?) -> Self {
             self.systemName = systemName
             return self
         }
         
         @discardableResult
-        func buttonTitle(_ buttonTitle: LocalizedStringKey?) -> Self {
+        public func buttonTitle(_ buttonTitle: LocalizedStringKey?) -> Self {
             self.buttonTitle = buttonTitle
             return self
         }
         
         @discardableResult
-        func dismissAction(_ dismissAction: (() -> Void)?) -> Self {
+        public func dismissAction(_ dismissAction: (() -> Void)?) -> Self {
             self.dismissAction = dismissAction
             return self
         }
 
         @discardableResult
-        func buttonAction(_ buttonAction: (() -> Void)?) -> Self {
+        public func buttonAction(_ buttonAction: (() -> Void)?) -> Self {
             self.buttonAction = buttonAction
             return self
         }
         
-        func build() -> ErrorStateConfigureModel {
+        public func build() -> ErrorStateConfigureModel {
             ErrorStateConfigureModel(
                 title: title,
                 subtitle: subtitle,
