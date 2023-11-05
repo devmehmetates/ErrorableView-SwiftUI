@@ -89,7 +89,7 @@ public extension ErrorableViewProtocol {
     }
 }
 
-public class ErrorableBaseViewModel: ObservableObject {
+open class ErrorableBaseViewModel: ObservableObject {
     @Published var pageState: PageStates = .loading
 }
 
