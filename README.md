@@ -17,30 +17,88 @@ private final class ExampleViewModel: ErrorableBaseViewModel {
     // Your actions will come here
 }
 ```
-### Create a SwiftUI view that conforms to the ErrorableView or ErrorableSheetView Protocols. (Usage is the same for both protocols.)
+### Create some SwiftUI view that conforms to the ErrorableView
 ```swift
-private struct SimpleExampleView: ErrorableView {
-    typealias ViewModel = ExampleViewModel
-    @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
-
-    var content: some View {
-        VStack {
-            Text("Loaded Statement!")
+@available(iOS 15.0, *)
+private struct ExampleContentView: View {
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                ForEach(0..<100, id: \.self) { _ in
+                    AsyncImage(url: URL(string: "https://picsum.photos/1000")) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } else {
+                            Color.gray
+                        }
+                    }.frame(height: 200, alignment: .center)
+                        .clipped()
+                }
+            }.navigationTitle("Example Content")
         }
     }
 }
+
+@available(iOS 15.0, *)
+private struct OnPageExampleView: ErrorableView {
+    @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
+
+    var content: some View {
+        ExampleContentView()
+    }
+    
+    var errorStateConfigModel: ErrorStateConfigureModel {
+        ErrorStateConfigureModel.Builder()
+            .buttonAction {
+                viewModel.refreshPage()
+            }.build()
+    }
+}
+
+@available(iOS 15.0, *)
+private struct SheetExampleView: ErrorableView {
+    @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
+
+    var content: some View {
+        ExampleContentView()
+    }
+    
+    var errorStateConfigModel: ErrorStateConfigureModel {
+        ErrorStateConfigureModel.Builder()
+            .buttonAction {
+                viewModel.refreshPage()
+            }.build()
+    }
+    
+    var errorPresentType: ErrorPresentTypes { .sheet }
+}
+
+@available(iOS 15.0, *)
+private struct FullScreenExampleView: ErrorableView {
+    @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
+
+    var content: some View {
+        ExampleContentView()
+    }
+    
+    var errorStateConfigModel: ErrorStateConfigureModel {
+        ErrorStateConfigureModel.Builder()
+            .buttonAction {
+                viewModel.refreshPage()
+            }.build()
+    }
+    
+    var errorPresentType: ErrorPresentTypes { .fullScreen }
+}
 ```
 
-## ErrorableView Demo Images
-<div>
-  <img width = 255 height = 525 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/5dc340f8-e455-46f9-9504-e3fcc6faf3a5">
-  <img width = 255 height = 525 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/f4c4b650-87fb-4b51-a305-c550ba2db85b">
-  <img width = 255 height = 525 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/f28af8bb-dea2-4581-9770-ce7879e99925">
-</div>
+## Sheet Type
+https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/1fe9e28a-8ba3-48b8-8d85-b2eb4c6aa672
 
-## ErrorableSheetView Demo Images
-<div>
-  <img width = 255 height = 525 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/5dc340f8-e455-46f9-9504-e3fcc6faf3a5">
-  <img width = 255 height = 525 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/3631f105-c1c2-4b71-9895-6a442e2b2dca">
-  <img width = 255 height = 525 src="https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/f28af8bb-dea2-4581-9770-ce7879e99925">
-</div>
+## OnPage Type
+https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/2c579c96-adec-4d6e-9739-1892d97666aa
+
+## Fullscreen Type
+https://github.com/devmehmetates/ErrorableView-SwiftUI/assets/74152011/6e34332f-6c24-489d-8bd2-bfd5ab2fb027
