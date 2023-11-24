@@ -60,6 +60,7 @@ import SwiftUI
  This default configuration is a convenient starting point and ensures a consistent error state representation across views that conform to the ErrorableViewProtocol. However, it can be overridden or customized as needed when defining specific views.
  - SeeAlso: `ErrorableViewProtocol`, `ErrorStateConfigureModel`
  */
+@available(*, deprecated, renamed: "ErrorableView", message: "Removed! Please Use`ErrorableView`")
 public protocol ErrorableViewProtocol: View where Body: View, ViewModel: ErrorableBaseViewModel {
     associatedtype ViewModel
     associatedtype Content
@@ -76,25 +77,20 @@ public protocol ErrorableViewProtocol: View where Body: View, ViewModel: Errorab
 
 public extension ErrorableViewProtocol {
     var errorStateConfigModel: ErrorStateConfigureModel {
-        ErrorStateConfigureModel.Builder()
-            .title("Error!")
-            .subtitle("We encountered an error.\n Please try again later!")
-            .systemName("exclamationmark.triangle")
-            .buttonTitle("Try Again!")
-            .buttonAction {
-                viewModel.pageState = .loading
-            }.dismissAction {
-                viewModel.pageState = .loading
-            }.build()
+        ErrorStateConfigureModel
+            .Builder()
+            .build()
     }
 }
 
 open class ErrorableBaseViewModel: ObservableObject {
+    @Published public var sheetsOpen: Bool = false
     @Published public var pageState: PageStates = .loading
     
     public init() {}
 }
 
+@available(*, deprecated, renamed: "ErrorableView", message: "Removed! Please Use`ErrorableView`")
 public protocol ErrorableSheetView: ErrorableViewProtocol {}
 
 public extension ErrorableSheetView where Content: View {
@@ -106,8 +102,7 @@ public extension ErrorableSheetView where Content: View {
                 content
             }
         }.sheet(
-            isPresented: .constant(viewModel.pageState == .failure),
-            onDismiss: errorStateConfigModel.dismissAction
+            isPresented: .constant(viewModel.pageState == .failure)
         ) {
             NavigationView {
                 ErrorStateView(model: errorStateConfigModel)
@@ -124,39 +119,21 @@ public extension ErrorableSheetView where Content: View {
     }
 }
 
-public protocol ErrorableView: ErrorableViewProtocol {}
-
-public extension ErrorableView where Content: View {
-    var body: some View {
-        VStack {
-            if viewModel.pageState == .loading {
-                LoadingStateView()
-            } else if viewModel.pageState == .failure {
-                ErrorStateView(model: errorStateConfigModel)
-            } else {
-                content
-            }
-        }
-    }
-}
-
 @frozen public struct ErrorStateConfigureModel {
     var title: LocalizedStringKey
     var subtitle: LocalizedStringKey?
     var icon: String?
     var systemName: String?
     var buttonTitle: LocalizedStringKey?
-    var dismissAction: (() -> Void)?
     var buttonAction: (() -> Void)?
     
     public class Builder {
         private var title: LocalizedStringKey = "Error!"
-        private var subtitle: LocalizedStringKey?
+        private var subtitle: LocalizedStringKey? = "We encountered an error.\n Please try again later!"
         private var icon: String?
-        private var systemName: String?
-        private var buttonTitle: LocalizedStringKey?
+        private var systemName: String? = "externaldrive.fill.trianglebadge.exclamationmark"
+        private var buttonTitle: LocalizedStringKey? = "Try Again!"
         private var buttonAction: (() -> Void)?
-        private var dismissAction: (() -> Void)?
         
         public init() {}
 
@@ -189,12 +166,6 @@ public extension ErrorableView where Content: View {
             self.buttonTitle = buttonTitle
             return self
         }
-        
-        @discardableResult
-        public func dismissAction(_ dismissAction: (() -> Void)?) -> Self {
-            self.dismissAction = dismissAction
-            return self
-        }
 
         @discardableResult
         public func buttonAction(_ buttonAction: (() -> Void)?) -> Self {
@@ -209,13 +180,13 @@ public extension ErrorableView where Content: View {
                 icon: icon,
                 systemName: systemName,
                 buttonTitle: buttonTitle,
-                dismissAction: dismissAction,
                 buttonAction: buttonAction
             )
         }
     }
 }
 
+@available(*, deprecated, renamed: "DefaultErrorView", message: "Removed! Please Use`DefaultErrorView`")
 @frozen public struct ErrorStateView: View {
     var model: ErrorStateConfigureModel
     
@@ -283,6 +254,7 @@ public extension ErrorableView where Content: View {
     }
 }
 
+@available(*, deprecated, renamed: "DefaultLoadingView", message: "Removed! Please Use`DefaultLoadingView`")
 @frozen public struct LoadingStateView: View {
     public var body: some View {
         VStack {
@@ -305,12 +277,7 @@ public extension ErrorableView where Content: View {
     }
 }
 
-@frozen public enum PageStates {
-    case loading
-    case successful
-    case failure
-}
-
+#if DEBUG
 private final class ExampleViewModel: ErrorableBaseViewModel {
     override init() {
         super.init()
@@ -328,11 +295,8 @@ private final class ExampleViewModel: ErrorableBaseViewModel {
 }
 
 @available(iOS 15.0, *)
-private struct ExampleView: ErrorableSheetView {
-    typealias ViewModel = ExampleViewModel
-    @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
-
-    var content: some View {
+private struct ExampleContentView: View {
+    var body: some View {
         NavigationView {
             ScrollView {
                 ForEach(0..<100, id: \.self) { _ in
@@ -347,37 +311,75 @@ private struct ExampleView: ErrorableSheetView {
                     }.frame(height: 200, alignment: .center)
                         .clipped()
                 }
-            }.navigationTitle("Example")
+            }.navigationTitle("Example Content")
         }
+    }
+}
+
+@available(iOS 15.0, *)
+private struct OnPageExampleView: ErrorableView {
+    @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
+
+    var content: some View {
+        ExampleContentView()
     }
     
     var errorStateConfigModel: ErrorStateConfigureModel {
         ErrorStateConfigureModel.Builder()
-            .title("Error!")
-            .subtitle("We encountered an error.\n Please try again later!")
-            .systemName("exclamationmark.triangle")
-            .buttonTitle("Try Again!")
             .buttonAction {
-                viewModel.refreshPage()
-            }.dismissAction{
                 viewModel.refreshPage()
             }.build()
     }
 }
 
 @available(iOS 15.0, *)
-private struct SimpleExampleView: ErrorableView {
-    typealias ViewModel = ExampleViewModel
+private struct SheetExampleView: ErrorableView {
     @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
 
     var content: some View {
-        VStack {
-            Text("Loaded Statement!")
-        }
+        ExampleContentView()
     }
+    
+    var errorStateConfigModel: ErrorStateConfigureModel {
+        ErrorStateConfigureModel.Builder()
+            .buttonAction {
+                viewModel.refreshPage()
+            }.build()
+    }
+    
+    var errorPresentType: ErrorPresentTypes { .sheet }
+}
+
+@available(iOS 15.0, *)
+private struct FullScreenExampleView: ErrorableView {
+    @ObservedObject var viewModel: ExampleViewModel = ExampleViewModel()
+
+    var content: some View {
+        ExampleContentView()
+    }
+    
+    var errorStateConfigModel: ErrorStateConfigureModel {
+        ErrorStateConfigureModel.Builder()
+            .buttonAction {
+                viewModel.refreshPage()
+            }.build()
+    }
+    
+    var errorPresentType: ErrorPresentTypes { .fullScreen }
 }
 
 @available(iOS 15.0, *)
 #Preview {
-    ExampleView()
+    OnPageExampleView()
 }
+
+@available(iOS 15.0, *)
+#Preview {
+    SheetExampleView()
+}
+
+@available(iOS 15.0, *)
+#Preview {
+    FullScreenExampleView()
+}
+#endif
