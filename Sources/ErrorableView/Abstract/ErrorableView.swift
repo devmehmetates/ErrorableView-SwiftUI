@@ -19,6 +19,8 @@ public protocol ErrorableViewP: View where Presenter: ErrorableBasePresenter {
     @ViewBuilder var errorContent: Self.ErrorContent { get }
     var errorStateConfigModel: ErrorStateConfigureModel { get }
     var errorPresentType: ErrorPresentTypes { get }
+    
+    func viewWillAppear()
 }
 
 public protocol ErrorableView: View where ViewModel: ErrorableBaseViewModel {
@@ -122,6 +124,9 @@ public extension ErrorableViewP {
                 sheetConfiguration()
             }
         }.animation(.spring, value: presenter.pageState)
+            .onAppear {
+                viewWillAppear()
+            }
     }
     
     @ViewBuilder var loadingContent: some View {
@@ -139,6 +144,8 @@ public extension ErrorableViewP {
     }
     
     var errorPresentType: ErrorPresentTypes { .onPage }
+    
+    func viewWillAppear() {}
 }
 
 fileprivate extension ErrorableViewP {
