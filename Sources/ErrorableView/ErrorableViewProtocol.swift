@@ -90,6 +90,13 @@ open class ErrorableBaseViewModel: ObservableObject {
     public init() {}
 }
 
+open class ErrorableBasePresenter: ObservableObject {
+    @Published public var sheetsOpen: Bool = false
+    @Published public var pageState: PageStates = .loading
+    
+    public init() {}
+}
+
 @available(*, deprecated, renamed: "ErrorableView", message: "Removed! Please Use`ErrorableView`")
 public protocol ErrorableSheetView: ErrorableViewProtocol {}
 
