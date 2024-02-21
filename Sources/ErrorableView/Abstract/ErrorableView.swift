@@ -113,8 +113,8 @@ fileprivate extension ErrorableView {
 }
 
 public extension ErrorableViewP {
-    var body: some View {
-        ZStack {
+    @ViewBuilder var body: some View {
+        Group {
             switch errorPresentType {
             case .onPage:
                 onPageConfiguration()
@@ -151,11 +151,12 @@ public extension ErrorableViewP {
 fileprivate extension ErrorableViewP {
     @ViewBuilder func onPageConfiguration() -> some View {
         Group {
-            if presenter.pageState == .loading {
+            switch presenter.pageState {
+            case .loading:
                 loadingContent
-            } else if presenter.pageState == .failure {
+            case .failure:
                 errorContent
-            } else {
+            case .successful:
                 content
             }
         }
