@@ -8,17 +8,20 @@
 import SwiftUI
 
 @frozen public struct DefaultLoadingView: View {
+    var loadingText: LocalizedStringKey
+    var progressViewColor: Color = .accentColor
+
     public var body: some View {
         VStack {
             if #available(iOS 15.0, *) {
                 ProgressView()
                     .scaleEffect(1.2)
-                    .tint(.accentColor)
+                    .tint(progressViewColor)
             }  else {
                 ProgressView()
                     .scaleEffect(1.2)
             }
-            Text("Loading...")
+            Text(loadingText)
                 .font(.caption)
                 .foregroundColor(.secondary)
                 .padding(.top)
@@ -27,5 +30,5 @@ import SwiftUI
 }
 
 #Preview {
-    DefaultLoadingView()
+    DefaultLoadingView(loadingText: "Loading...")
 }

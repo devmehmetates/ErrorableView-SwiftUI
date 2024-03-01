@@ -7,84 +7,189 @@
 
 import SwiftUI
 
-@frozen public struct DefaultErrorView: View {
-    var model: ErrorStateConfigureModel
-    var type: ErrorPresentTypes
+protocol ErrorableView: View {
+    var type: ErrorPresentTypes { get set }
+}
+
+@frozen public struct DefaultErrorView: ErrorableView {
+    var uimodel: DefaultErrorPageUIModel = .Builder().build()
+    var type: ErrorPresentTypes = .sheet
+    var buttonAction: (() -> Void)? = nil
 
     public var body: some View {
         VStack {
-            if type != .onPage {
-                HStack {
-                    Spacer()
-                    Button {
-                        model.buttonAction?()
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title)
-                    }.accentColor(.secondary)
-                }.padding(.horizontal)
-            }
+            closeButtonView
             Spacer()
 
             VStack {
-                Group {
-                    if let icon = model.icon {
-                        Image(icon)
-                    } else if let systemName = model.systemName {
-                        Image(systemName: systemName)
-                    }
-                }.imageScale(.large)
+                iconImageView
+                    .imageScale(.large)
                     .font(.largeTitle)
-                
-                Text(model.title)
+
+                Text(uimodel.title)
                     .font(.title)
                     .fontWeight(.bold)
                     .multilineTextAlignment(.center)
-            }.padding(.bottom)
-            
-            if let subtitle = model.subtitle {
-                Group {
-                    if #available(iOS 15.0, *) {
-                        Text(subtitle)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text(subtitle)
-                            .foregroundColor(.secondary)
-                    }
-                }.font(.headline)
-                    .multilineTextAlignment(.center)
             }
+            .padding(.bottom)
+
+            subTitleView
 
             Spacer()
 
-            if let buttonTitle = model.buttonTitle {
-                if #available(iOS 15.0, *) {
-                    Button {
-                        model.buttonAction?()
-                    } label: {
-                        Spacer()
-                        Text(buttonTitle)
-                            .bold()
-                            .padding(.vertical, 5)
-                        Spacer()
-                    }.buttonStyle(.borderedProminent)
-                        .padding(.horizontal)
-                } else {
-                    Button {
-                        model.buttonAction?()
-                    } label: {
-                        Spacer()
-                        Text(buttonTitle)
-                            .bold()
-                        Spacer()
-                    }.modifier(ErrorStateButtonModifier())
-                        .padding(.horizontal)
-                }
-            }
+            buttonView
         }.padding(.vertical)
     }
 }
 
+// MARK: - UIComponents
+private extension DefaultErrorView {
+    @ViewBuilder
+    var closeButtonView: some View {
+        if type != .onPage {
+            HStack {
+                Spacer()
+                Button {
+                    buttonAction?()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title)
+                }.accentColor(.secondary)
+            }.padding(.horizontal)
+        }
+    }
+
+    @ViewBuilder
+    var iconImageView: some View {
+        if let icon = uimodel.icon {
+            Image(icon)
+        } else if let systemName = uimodel.systemName {
+            Image(systemName: systemName)
+        }
+    }
+
+    @ViewBuilder
+    var subTitleView: some View {
+        if let subtitle = uimodel.subtitle {
+            Group {
+                if #available(iOS 15.0, *) {
+                    Text(subtitle)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(subtitle)
+                        .foregroundColor(.secondary)
+                }
+            }.font(.headline)
+                .multilineTextAlignment(.center)
+        }
+    }
+
+    @ViewBuilder
+    var buttonView: some View {
+        if let buttonTitle = uimodel.buttonTitle {
+            if #available(iOS 15.0, *) {
+                Button {
+                    buttonAction?()
+                } label: {
+                    Spacer()
+                    Text(buttonTitle)
+                        .bold()
+                        .padding(.vertical, 5)
+                    Spacer()
+                }.buttonStyle(.borderedProminent)
+                    .padding(.horizontal)
+            } else {
+                Button {
+                    buttonAction?()
+                } label: {
+                    Spacer()
+                    Text(buttonTitle)
+                        .bold()
+                    Spacer()
+                }.modifier(ErrorStateButtonModifier())
+                    .padding(.horizontal)
+            }
+        }
+    }
+}
+
+// MARK: - UIModel
+@frozen public struct DefaultErrorPageUIModel {
+    var title: LocalizedStringKey
+    var subtitle: LocalizedStringKey?
+    var icon: String?
+    var systemName: String?
+    var buttonTitle: LocalizedStringKey?
+
+    public class Builder {
+        private var type: ErrorPresentTypes = .sheet
+        private var title: LocalizedStringKey = "Error!"
+        private var subtitle: LocalizedStringKey? = "We encountered an error.\n Please try again later!"
+        private var icon: String?
+        private var systemName: String? = "externaldrive.fill.trianglebadge.exclamationmark"
+        private var buttonTitle: LocalizedStringKey? = "Try Again!"
+
+        public init() {}
+
+        @discardableResult
+        public func type(_ type: ErrorPresentTypes) -> Self {
+            self.title = title
+            return self
+        }
+
+        @discardableResult
+        public func title(_ title: LocalizedStringKey) -> Self {
+            self.title = title
+            return self
+        }
+
+        @discardableResult
+        public func subtitle(_ subtitle: LocalizedStringKey?) -> Self {
+            self.subtitle = subtitle
+            return self
+        }
+
+        @discardableResult
+        public func icon(_ icon: String?) -> Self {
+            self.icon = icon
+            return self
+        }
+
+        @discardableResult
+        public func systemName(_ systemName: String?) -> Self {
+            self.systemName = systemName
+            return self
+        }
+
+        @discardableResult
+        public func buttonTitle(_ buttonTitle: LocalizedStringKey?) -> Self {
+            self.buttonTitle = buttonTitle
+            return self
+        }
+
+        public func build() -> DefaultErrorPageUIModel {
+            DefaultErrorPageUIModel(
+                title: title,
+                subtitle: subtitle,
+                icon: icon,
+                systemName: systemName,
+                buttonTitle: buttonTitle
+            )
+        }
+    }
+}
+
+// MARK: - ViewModifer(s)
+@frozen public struct ErrorStateButtonModifier: ViewModifier {
+    public func body(content: Content) -> some View {
+        content
+            .padding(.vertical, 5)
+            .foregroundColor(.primary)
+            .background(Color.accentColor)
+            .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+}
+
 #Preview {
-    DefaultErrorView(model: .Builder().build(), type: .onPage)
+    DefaultErrorView()
 }
