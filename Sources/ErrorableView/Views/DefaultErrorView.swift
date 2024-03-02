@@ -12,9 +12,17 @@ public protocol ErrorableView: View {
 }
 
 @frozen public struct DefaultErrorView: ErrorableView {
-    var uimodel: DefaultErrorPageUIModel = .Builder().build()
-    public var type: ErrorPresentTypes = .sheet
-    var buttonAction: (() -> Void)? = nil
+    var uimodel: DefaultErrorPageUIModel
+    public var type: ErrorPresentTypes
+    var buttonAction: (() -> Void)?
+
+    public init(uimodel: DefaultErrorPageUIModel = .Builder().build(),
+                type: ErrorPresentTypes = .sheet,
+                buttonAction: (() -> Void)? = nil) {
+        self.uimodel = uimodel
+        self.type = type
+        self.buttonAction = buttonAction
+    }
 
     public var body: some View {
         VStack {

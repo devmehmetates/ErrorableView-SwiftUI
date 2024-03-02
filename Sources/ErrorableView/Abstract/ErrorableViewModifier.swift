@@ -12,7 +12,7 @@ public struct ErrorableViewModifier<ErrorContent: ErrorableView>: ViewModifier {
     @Binding var pageState: PageStates
     var errorContent: ErrorContent
 
-    init(pageState: Binding<PageStates>,
+    public init(pageState: Binding<PageStates>,
          @ViewBuilder errorContent: () -> ErrorContent) {
         self._pageState = pageState
         self.errorContent = errorContent()

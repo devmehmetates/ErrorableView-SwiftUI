@@ -9,7 +9,14 @@ import SwiftUI
 
 @frozen public struct DefaultLoadingView: View {
     var loadingText: LocalizedStringKey
-    var progressViewColor: Color = .accentColor
+    var progressViewColor: Color
+
+    public init(loadingText: LocalizedStringKey,
+                progressViewColor: Color = .accentColor
+    ) {
+        self.loadingText = loadingText
+        self.progressViewColor = progressViewColor
+    }
 
     public var body: some View {
         VStack {
