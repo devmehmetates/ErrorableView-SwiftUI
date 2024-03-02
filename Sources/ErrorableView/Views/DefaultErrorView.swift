@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-protocol ErrorableView: View {
+public protocol ErrorableView: View {
     var type: ErrorPresentTypes { get set }
 }
 
 @frozen public struct DefaultErrorView: ErrorableView {
     var uimodel: DefaultErrorPageUIModel = .Builder().build()
-    var type: ErrorPresentTypes = .sheet
+    public var type: ErrorPresentTypes = .sheet
     var buttonAction: (() -> Void)? = nil
 
     public var body: some View {

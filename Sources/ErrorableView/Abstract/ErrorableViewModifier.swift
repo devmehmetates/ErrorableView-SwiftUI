@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ErrorableViewModifier<ErrorContent: ErrorableView>: ViewModifier {
+public struct ErrorableViewModifier<ErrorContent: ErrorableView>: ViewModifier {
     @State private var sheetTrigger: Bool = false
     @Binding var pageState: PageStates
     var errorContent: ErrorContent
@@ -18,7 +18,7 @@ struct ErrorableViewModifier<ErrorContent: ErrorableView>: ViewModifier {
         self.errorContent = errorContent()
     }
 
-    func body(content: Content) -> some View {
+    public func body(content: Content) -> some View {
         switch errorContent.type {
         case .onPage:
             onPageState(content: content)
