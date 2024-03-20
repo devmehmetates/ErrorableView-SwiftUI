@@ -7,6 +7,15 @@
 
 import SwiftUI
 
+public extension View {
+    @ViewBuilder
+    func errorableView<Content: ErrorableView>(pageState: Binding<PageStates>, @ViewBuilder content: () -> Content) -> some View {
+        self.modifier(ErrorableViewModifier(pageState: pageState) {
+            content()
+        })
+    }
+}
+
 public struct ErrorableViewModifier<ErrorContent: ErrorableView>: ViewModifier {
     @State private var sheetTrigger: Bool = false
     @Binding var pageState: PageStates
@@ -93,14 +102,14 @@ struct TestView: View {
                     }
                 }.navigationTitle("Example Content")
             }
-            .modifier(ErrorableViewModifier(pageState: $pageState) {
+            .errorableView(pageState: $pageState) {
                 DefaultErrorView(type: .sheet) {
                     pageState = .loading
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                         pageState = .successful
                     }
                 }
-            })
+            }
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                     pageState = .failure
