@@ -65,6 +65,7 @@ public struct ErrorableViewModifier<ErrorContent: ErrorableView>: ViewModifier {
         }
     }
 
+    #if os(iOS)
     @ViewBuilder
     private func fullscreenState(content: Content) -> some View {
         Group {
@@ -79,6 +80,7 @@ public struct ErrorableViewModifier<ErrorContent: ErrorableView>: ViewModifier {
             errorContent
         }
     }
+    #endif
 }
 
 @available(iOS 15.0, *)
