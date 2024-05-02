@@ -10,3 +10,8 @@
     case fullScreen
     case sheet
 }
+
+@frozen public enum LoadingPresenterTypes {
+    case onPage
+    case overlay
+}
