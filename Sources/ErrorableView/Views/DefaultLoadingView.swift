@@ -26,10 +26,9 @@ public protocol LoadingView: View {
     }
 
     public var body: some View {
+        #if os(macOS)
         ZStack {
             Rectangle()
-                .foregroundColor(.red)
-                .ignoresSafeArea()
                 .opacity(type == .onPage ? 1 : 0.3)
             VStack {
                 if #available(iOS 15.0, *) {
@@ -45,7 +44,28 @@ public protocol LoadingView: View {
                     .foregroundColor(.secondary)
                     .padding(.top)
             }
-        }
+        }.ignoresSafeArea()
+        #else
+        ZStack {
+            Rectangle()
+                .opacity(type == .onPage ? 1 : 0.3)
+            VStack {
+                if #available(iOS 15.0, *) {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                        .tint(progressViewColor)
+                }  else {
+                    ProgressView()
+                        .scaleEffect(1.2)
+                }
+                Text(loadingText)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.top)
+            }
+        }.ignoresSafeArea()
+            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+        #endif
     }
 }
 
