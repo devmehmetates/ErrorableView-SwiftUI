@@ -9,10 +9,39 @@ import SwiftUI
 
 public extension View {
     @ViewBuilder
+    func akErrorView<ErrorContent: ErrorableView, LoadingContent: LoadingView>(
+        pageState: Binding<PageStates>,
+        @ViewBuilder errorContent: () -> ErrorContent,
+        @ViewBuilder loadingContent: () -> LoadingContent = { DefaultLoadingView(loadingText: "Loading...") }
+    ) -> some View {
+        self.modifier(AKErrorViewModifier(pageState: pageState) {
+            errorContent()
+        } loadingContent: {
+            loadingContent()
+        })
+    }
+
+    @ViewBuilder
+    func akErrorView<LoadingContent: LoadingView>(
+        pageState: Binding<PageStates>,
+        action: @escaping () -> Void,
+        @ViewBuilder loadingContent: () -> LoadingContent = { DefaultLoadingView(loadingText: "Loading...") }
+    ) -> some View {
+        self.modifier(AKErrorViewModifier(pageState: pageState) {
+            DefaultErrorView(state: pageState) {
+                action()
+            }
+        } loadingContent: {
+            loadingContent()
+        })
+    }
+
+    @available(*, deprecated, renamed: "akErrorView", message: "")
+    @ViewBuilder
     func errorableView<Content: ErrorableView, LoadingContent: LoadingView>(pageState: Binding<PageStates>,
                                                                         @ViewBuilder content: () -> Content,
                                                                         @ViewBuilder loadingContent: (() -> LoadingContent) = { DefaultLoadingView(loadingText: "Loading...") }) -> some View {
-        self.modifier(ErrorableViewModifier(pageState: pageState) {
+        self.modifier(AKErrorViewModifier(pageState: pageState) {
             content()
         } loadingContent: {
             loadingContent()
@@ -20,7 +49,7 @@ public extension View {
     }
 }
 
-public struct ErrorableViewModifier<ErrorContent: ErrorableView, LoadingContent: LoadingView>: ViewModifier {
+public struct AKErrorViewModifier<ErrorContent: ErrorableView, LoadingContent: LoadingView>: ViewModifier {
     @State private var sheetTrigger: Bool = false
     @Binding var pageState: PageStates
     var errorContent: ErrorContent
@@ -115,6 +144,7 @@ public struct ErrorableViewModifier<ErrorContent: ErrorableView, LoadingContent:
     #endif
 }
 
+#if DEBUG
 @available(iOS 15.0, *)
 struct TestView: View {
     @State private var pageState: PageStates = .loading
@@ -136,12 +166,9 @@ struct TestView: View {
                     }
                 }.navigationTitle("Example Content")
             }
-            .errorableView(pageState: $pageState) {
-                DefaultErrorView(type: .sheet) {
-                    pageState = .loading
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        pageState = .successful
-                    }
+            .akErrorView(pageState: $pageState) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    pageState = .successful
                 }
             }
             .onAppear {
@@ -159,3 +186,4 @@ struct TestView: View {
        EmptyView()
     }
 }
+#endif

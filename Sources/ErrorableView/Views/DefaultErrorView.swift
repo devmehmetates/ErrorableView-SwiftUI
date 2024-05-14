@@ -12,16 +12,22 @@ public protocol ErrorableView: View {
 }
 
 @frozen public struct DefaultErrorView: ErrorableView {
-    var uimodel: DefaultErrorPageUIModel
+    @Environment(\.dismiss) private var dismiss
+    @Binding private var state: PageStates
+    private var uimodel: DefaultErrorPageUIModel
+    private var buttonAction: (() -> Void)?
     public var type: ErrorPresentTypes
-    var buttonAction: (() -> Void)?
 
-    public init(uimodel: DefaultErrorPageUIModel = .Builder().build(),
-                type: ErrorPresentTypes = .sheet,
-                buttonAction: (() -> Void)? = nil) {
+    public init(
+        uimodel: DefaultErrorPageUIModel = .Builder().build(),
+        type: ErrorPresentTypes = .sheet,
+        state: Binding<PageStates>,
+        buttonAction: (() -> Void)? = nil
+    ) {
         self.uimodel = uimodel
         self.type = type
         self.buttonAction = buttonAction
+        self._state = state
     }
 
     public var body: some View {
@@ -59,6 +65,8 @@ private extension DefaultErrorView {
                 Spacer()
                 Button {
                     buttonAction?()
+                    state = .loading
+                    dismiss()
                 } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.title)
@@ -98,6 +106,8 @@ private extension DefaultErrorView {
             if #available(iOS 15.0, *) {
                 Button {
                     buttonAction?()
+                    state = .loading
+                    dismiss()
                 } label: {
                     Spacer()
                     Text(buttonTitle)
@@ -199,5 +209,5 @@ private extension DefaultErrorView {
 }
 
 #Preview {
-    DefaultErrorView()
+    DefaultErrorView(state: .constant(.loading))
 }

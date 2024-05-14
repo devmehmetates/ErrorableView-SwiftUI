@@ -12,13 +12,14 @@ public protocol LoadingView: View {
 }
 
 @frozen public struct DefaultLoadingView: LoadingView {
-    var loadingText: LocalizedStringKey
-    var progressViewColor: Color
+    private let loadingText: LocalizedStringKey
+    private let progressViewColor: Color
     public var type: LoadingPresenterTypes
 
-    public init(loadingText: LocalizedStringKey,
-                progressViewColor: Color = .accentColor,
-                type: LoadingPresenterTypes = .overlay
+    public init(
+        loadingText: LocalizedStringKey,
+        progressViewColor: Color = .accentColor,
+        type: LoadingPresenterTypes = .overlay
     ) {
         self.loadingText = loadingText
         self.progressViewColor = progressViewColor
@@ -26,7 +27,7 @@ public protocol LoadingView: View {
     }
 
     public var body: some View {
-        #if os(macOS)
+#if os(macOS)
         ZStack {
             Rectangle()
                 .opacity(type == .onPage ? 1 : 0.3)
@@ -45,30 +46,41 @@ public protocol LoadingView: View {
                     .padding(.top)
             }
         }.ignoresSafeArea()
-        #else
-        ZStack {
-            Rectangle()
-                .opacity(type == .onPage ? 1 : 0.3)
+#else
+        switch type {
+        case .onPage:
             VStack {
-                if #available(iOS 15.0, *) {
-                    ProgressView()
-                        .scaleEffect(1.2)
-                        .tint(progressViewColor)
-                }  else {
-                    ProgressView()
-                        .scaleEffect(1.2)
-                }
+                ProgressView()
+                    .scaleEffect(1.2)
+                    .tint(progressViewColor)
+
                 Text(loadingText)
-                    .font(.caption)
                     .foregroundColor(.secondary)
                     .padding(.top)
             }
-        }.ignoresSafeArea()
-            .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-        #endif
+        case .overlay:
+            VStack {
+                HStack {
+                    Spacer()
+                }
+                Spacer()
+                ProgressView()
+                    .scaleEffect(1.2)
+                    .tint(progressViewColor)
+
+                Text(loadingText)
+                    .foregroundColor(.secondary)
+                    .padding(.top)
+                Spacer()
+            }.background {
+                Rectangle()
+                    .foregroundStyle(.ultraThinMaterial)
+            }.ignoresSafeArea()
+        }
+#endif
     }
 }
 
 #Preview {
-    DefaultLoadingView(loadingText: "Loading...")
+    TestView()
 }
