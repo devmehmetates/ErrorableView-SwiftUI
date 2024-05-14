@@ -15,35 +15,10 @@ struct TestView: View {
     @State private var pageState: PageStates = .loading
 
     var body: some View {
-            NavigationView {
-                ScrollView {
-                    ForEach(0..<100, id: \.self) { _ in
-                        AsyncImage(url: URL(string: "https://picsum.photos/1000")) { phase in
-                            if let image = phase.image {
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            } else {
-                                Color.gray
-                            }
-                        }.frame(height: 200, alignment: .center)
-                            .clipped()
-                    }
-                }.navigationTitle("Example Content")
-            }
-            .modifier(ErrorableViewModifier(pageState: $pageState) { // Like this
-                DefaultErrorView(type: .sheet) {
-                    pageState = .loading
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        pageState = .successful
-                    }
-                }
-            })
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    pageState = .failure
-                }
-            }
+        // YOUR CODES
+        .akErrorView(pageState: $pageState) {
+            // TRY AGAIN ACTION
+        }
     }
 }
 ```
