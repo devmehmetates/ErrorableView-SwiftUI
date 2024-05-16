@@ -19,7 +19,7 @@ public protocol LoadingView: View {
     public init(
         loadingText: LocalizedStringKey,
         progressViewColor: Color = .accentColor,
-        type: LoadingPresenterTypes = .overlay
+        type: LoadingPresenterTypes = .onPage
     ) {
         self.loadingText = loadingText
         self.progressViewColor = progressViewColor
