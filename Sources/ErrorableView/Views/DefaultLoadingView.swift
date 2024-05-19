@@ -82,5 +82,5 @@ public protocol LoadingView: View {
 }
 
 #Preview {
-    TestView()
+    DefaultLoadingView(loadingText: "Loading...")
 }
